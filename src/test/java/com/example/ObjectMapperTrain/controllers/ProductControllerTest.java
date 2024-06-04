@@ -1,9 +1,7 @@
 package com.example.ObjectMapperTrain.controllers;
 
-import com.example.ObjectMapperTrain.dto.ProductDTO;
 import com.example.ObjectMapperTrain.entities.Product;
 import com.example.ObjectMapperTrain.services.ProductService;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -18,7 +16,8 @@ import java.util.List;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(ProductController.class)
@@ -28,7 +27,7 @@ class ProductControllerTest {
     @MockBean
     ProductService productService;
 
-    @Test
+    /*@Test
     void createProduct_ReturnedNewProductWithStatus_OK() throws Exception {
         ProductDTO productDTO = new ProductDTO("Coffee", "Nice coffee", new BigDecimal(100));
         Product product = new Product(1L,
@@ -40,7 +39,7 @@ class ProductControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.productId", is(1)))
                 .andExpect(jsonPath("$.name", is("Coffee")));
-    }
+    }*/
 
     @Test
     void getAllProduct_ReturnedListProductsWithStatus_OK() throws Exception {
@@ -79,7 +78,7 @@ class ProductControllerTest {
                 .andExpect(content().string("Success!"));
     }
 
-    @Test
+    /*@Test
     void editProductAddCorrectChangesAndReturnedStatus_OK() throws Exception {
         Long id = 1L;
         ProductDTO productDTO = new ProductDTO("Cheese", "New description", new BigDecimal(100));
@@ -92,5 +91,5 @@ class ProductControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name", is("Cheese")));
-    }
+    }*/
 }

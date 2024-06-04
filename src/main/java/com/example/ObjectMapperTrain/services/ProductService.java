@@ -1,11 +1,13 @@
 package com.example.ObjectMapperTrain.services;
 
-import com.example.ObjectMapperTrain.dto.ProductDTO;
 import com.example.ObjectMapperTrain.entities.Product;
 import com.example.ObjectMapperTrain.exceptions.ProductNotFoundException;
 import com.example.ObjectMapperTrain.repositories.ProductRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.LockModeType;
 import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +17,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class ProductService {
+    @Autowired
+    private ObjectMapper objectMapper;
     private final ProductRepository productRepository;
 
     public ProductService(ProductRepository productRepository) {
@@ -22,16 +26,18 @@ public class ProductService {
     }
     @Transactional
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    public Product createProduct(ProductDTO productDTO) {
+    public Product createProduct(Product productRequest) throws JsonProcessingException {
+        String json = objectMapper.writeValueAsString(productRequest);
         List<Product> productList = productRepository.findAll();
-        boolean check = productList.stream().anyMatch(product -> product.getName().equals(productDTO.name()));
+        boolean check = productList.stream().anyMatch(product -> product.getName().equals(productRequest.getName()));
         if (check) {
-            Product product = productRepository.findByName(productDTO.name());
+            Product product = productRepository.findByName(productRequest.getName());
             product.setQuantityInStock(product.getQuantityInStock() + 1);
             return productRepository.save(product);
 
         }
-        Product product = new Product(productDTO.name(), productDTO.description(), productDTO.cost(), 1);
+        Product product = objectMapper.readValue(json, Product.class);
+        product.setQuantityInStock(1);
         return productRepository.save(product);
     }
 
@@ -74,12 +80,12 @@ public class ProductService {
     }
     @Transactional
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    public Product editProduct(Long productId, ProductDTO productDTO){
+    public Product editProduct(Long productId, Product productRequest){
         Product product = productRepository.findById(productId).orElseThrow(
                 () -> new ProductNotFoundException("Product not found"));
-        product.setName(productDTO.name());
-        product.setDescription(productDTO.description());
-        product.setCost(productDTO.cost());
+        product.setName(productRequest.getName());
+        product.setDescription(productRequest.getDescription());
+        product.setCost(productRequest.getCost());
         return productRepository.save(product);
     }
 }

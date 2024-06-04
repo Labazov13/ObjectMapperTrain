@@ -1,13 +1,15 @@
 package com.example.ObjectMapperTrain.controllers;
 
-import com.example.ObjectMapperTrain.dto.ProductDTO;
 import com.example.ObjectMapperTrain.entities.Product;
 import com.example.ObjectMapperTrain.response.View;
 import com.example.ObjectMapperTrain.services.ProductService;
 import com.fasterxml.jackson.annotation.JsonView;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import jakarta.validation.Valid;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
 @RestController
@@ -20,8 +22,8 @@ public class ProductController {
     }
     @PostMapping(value = "/new", produces = MediaType.APPLICATION_JSON_VALUE)
     @JsonView(View.ResponseProductFull.class)
-    public ResponseEntity<Product> createProduct(@RequestBody ProductDTO productDTO){
-        return ResponseEntity.ok(productService.createProduct(productDTO));
+    public ResponseEntity<Product> createProduct(@Valid @RequestBody Product productRequest) throws JsonProcessingException {
+        return ResponseEntity.ok(productService.createProduct(productRequest));
     }
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @JsonView(View.ResponseProductFull.class)
@@ -40,7 +42,7 @@ public class ProductController {
     }
     @PutMapping(value = "/edit/{productId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Product> editProduct(@PathVariable(name = "productId") Long productId,
-                                               @RequestBody ProductDTO productDTO){
-        return ResponseEntity.ok(productService.editProduct(productId, productDTO));
+                                               @Valid @RequestBody Product productRequest){
+        return ResponseEntity.ok(productService.editProduct(productId, productRequest));
     }
 }
