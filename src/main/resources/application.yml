@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: ObjectMapperTrain
+  datasource:
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: postgres
+    password: 1
+    driver-class-name: org.postgresql.Driver
+  liquibase:
+    change-log: db/changelog/db.changelog-master.yaml
+    enabled: true
+  jpa:
+    show-sql: true
+
