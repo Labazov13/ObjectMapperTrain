@@ -43,12 +43,7 @@ public class Product {
     @ManyToMany(mappedBy = "productList")
     private List<Order> orders;
 
-    public Product(String name, String description, BigDecimal cost, Integer quantityInStock) {
-        this.name = name;
-        this.description = description;
-        this.cost = cost;
-        this.quantityInStock = quantityInStock;
-    }
+
 
     public Product(String name, String description, BigDecimal cost) {
         this.name = name;

@@ -1,18 +1,24 @@
 package com.example.ObjectMapperTrain.services;
 
 import com.example.ObjectMapperTrain.entities.Product;
+import com.example.ObjectMapperTrain.exceptions.FieldNotFilledException;
 import com.example.ObjectMapperTrain.exceptions.ProductNotFoundException;
 import com.example.ObjectMapperTrain.repositories.ProductRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.LockModeType;
 import jakarta.transaction.Transactional;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,19 +32,29 @@ public class ProductService {
     }
     @Transactional
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    public Product createProduct(Product productRequest) throws JsonProcessingException {
-        String json = objectMapper.writeValueAsString(productRequest);
-        List<Product> productList = productRepository.findAll();
-        boolean check = productList.stream().anyMatch(product -> product.getName().equals(productRequest.getName()));
-        if (check) {
-            Product product = productRepository.findByName(productRequest.getName());
-            product.setQuantityInStock(product.getQuantityInStock() + 1);
-            return productRepository.save(product);
+    public Product createProduct(String productRequest) throws JsonProcessingException {
+        Product productFromJson = objectMapper.readValue(productRequest, Product.class);
+        if (checkProduct(productFromJson, "partial")){
+            List<Product> productList = productRepository.findAll();
+            boolean check = productList.stream().anyMatch(product -> product.getName().equals(productFromJson.getName()));
+            if (check) {
+                Product product = productRepository.findByName(productFromJson.getName());
+                product.setQuantityInStock(product.getQuantityInStock() + 1);
+                return productRepository.save(product);
+            }
 
+            productFromJson.setQuantityInStock(1);
+            return productRepository.save(productFromJson);
         }
-        Product product = objectMapper.readValue(json, Product.class);
-        product.setQuantityInStock(1);
-        return productRepository.save(product);
+        throw new FieldNotFilledException("FIELD NOT FILLED");
+    }
+    public boolean checkProduct(Product product, String constructorType) {
+        Validator validator;
+        try (ValidatorFactory factory = Validation.buildDefaultValidatorFactory()) {
+            validator = factory.getValidator();
+        }
+        Set<ConstraintViolation<Product>> violations = validator.validate(product);
+        return violations.isEmpty() && constructorType.equals("partial");
     }
 
     public List<Product> getAllProduct(){

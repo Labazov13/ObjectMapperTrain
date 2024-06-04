@@ -22,7 +22,7 @@ public class ProductController {
     }
     @PostMapping(value = "/new", produces = MediaType.APPLICATION_JSON_VALUE)
     @JsonView(View.ResponseProductFull.class)
-    public ResponseEntity<Product> createProduct(@Valid @RequestBody Product productRequest) throws JsonProcessingException {
+    public ResponseEntity<Product> createProduct(@RequestBody String productRequest) throws JsonProcessingException {
         return ResponseEntity.ok(productService.createProduct(productRequest));
     }
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)

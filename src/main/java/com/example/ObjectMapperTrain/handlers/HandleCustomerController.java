@@ -1,6 +1,7 @@
 package com.example.ObjectMapperTrain.handlers;
 
 import com.example.ObjectMapperTrain.exceptions.CustomerNotFoundException;
+import com.example.ObjectMapperTrain.exceptions.FieldNotFilledException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -14,6 +15,11 @@ import java.util.Map;
 
 @RestControllerAdvice
 public class HandleCustomerController {
+
+    @ExceptionHandler(FieldNotFilledException.class)
+    public ResponseEntity<?> handleFieldNotFilledException(FieldNotFilledException exception){
+        return ResponseEntity.badRequest().body(exception.getMessage());
+    }
     @ExceptionHandler(CustomerNotFoundException.class)
     public ResponseEntity<?> handleCustomerNotFoundException(CustomerNotFoundException exception){
         return ResponseEntity.badRequest().body(exception.getMessage());

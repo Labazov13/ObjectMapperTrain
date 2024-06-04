@@ -22,6 +22,7 @@ public class OrderController {
     public ResponseEntity<Order> createOrder(@RequestBody OrderDTO orderDTO){
         return ResponseEntity.ok(orderService.createOrder(orderDTO));
     }
+
     @PutMapping(value = "/pay/{orderId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @JsonView(View.ResponseOrder.class)
     public ResponseEntity<Order> payForOrder(@PathVariable(value = "orderId") Long orderId){

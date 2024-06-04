@@ -42,6 +42,7 @@ public class OrderService {
         }
         throw new CustomerNotFoundException("Customer not found");
     }
+
     @Transactional
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     public Order payOrder(Long orderId){
